@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tailveng/views/measurement.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -25,6 +26,14 @@ class HomeView extends StatelessWidget {
               onPressed: () {},
             ),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.pink,
+          onPressed: (() {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => Measurement()));
+          }),
+          child: Icon(Icons.add),
         ),
         body: ListView(
           children: [
