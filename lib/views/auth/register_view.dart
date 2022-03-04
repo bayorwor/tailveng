@@ -112,7 +112,7 @@ class _RegisterViewState extends State<RegisterView> {
                   height: 50,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => HomeView(),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:tailveng/shared/style_card.dart';
+import 'package:tailveng/views/material_list.dart';
 import 'package:tailveng/views/measurement.dart';
 
 class HomeView extends StatelessWidget {
@@ -7,99 +10,126 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: ListTile(
-            textColor: Colors.white,
-            leading: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  'https://t3.ftcdn.net/jpg/04/56/88/88/240_F_456888827_ChAcJFPecv4MW9srZ7ploxeHIfzU8Ypy.jpg',
-                  height: 40,
-                  width: 40,
-                )),
-            title: Text('Good Morning'),
-            subtitle: Text('Esther Barahona'),
+      appBar: AppBar(
+        title: ListTile(
+          textColor: Colors.white,
+          leading: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                'https://t3.ftcdn.net/jpg/04/56/88/88/240_F_456888827_ChAcJFPecv4MW9srZ7ploxeHIfzU8Ypy.jpg',
+                height: 40,
+                width: 40,
+              )),
+          title: Text('Good Morning'),
+          subtitle: Text('Esther Barahona'),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: () {},
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.more_vert),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.pink,
-          onPressed: (() {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Measurement()));
-          }),
-          child: Icon(Icons.add),
-        ),
-        body: ListView(
-          children: [
-            Container(
-              child: Stack(children: [
-                Container(
-                  height: 60,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFC317B),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.pink,
+        onPressed: (() {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Measurement()));
+        }),
+        child: Icon(Icons.add),
+      ),
+      body: ListView(
+        children: [
+          Container(
+            child: Stack(children: [
+              Container(
+                height: 60,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: Color(0xFFFC317B),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                margin: EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search a style ...',
+                    prefixIcon: Icon(
+                      Icons.search,
+                      size: 20,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                Container(
-                  height: 40,
-                  margin: EdgeInsets.all(30),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search a style ...',
-                      prefixIcon: Icon(
-                        Icons.search,
-                        size: 20,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                )
-              ]),
-            ),
-            Row(
-              children: [
-                HomeCard(
+              )
+            ]),
+          ),
+          Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MaterialList()));
+                },
+                child: HomeCard(
                   title: 'Number of Finished Material',
                   number: '12',
                   fcolor: Color(0xFFED91E4),
                   scolor: Color(0xDEDEDE),
                 ),
-                HomeCard(
-                  title: 'Number of Finished Material',
-                  number: '12',
-                  fcolor: Color(0xFFED91E4),
-                  scolor: Color(0xDEDEDE),
-                ),
-              ],
+              ),
+              HomeCard(
+                title: 'Number of Finished Material',
+                number: '12',
+                fcolor: Color(0xFFED91E4),
+                scolor: Color(0xDEDEDE),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(0),
+              width: MediaQuery.of(context).size.width - 30,
+              child: HomeCard(
+                title: 'Number of Finished Material',
+                number: '12',
+                fcolor: Color(0xFFFC317B),
+                scolor: Color(0xDEDEDE),
+              ),
             ),
-            Row(
-              children: [
-                HomeCard(
-                  title: 'Number of Finished Material',
-                  number: '12',
-                  fcolor: Color(0xFFFC317B),
-                  scolor: Color(0xDEDEDE),
-                ),
-              ],
-            )
-          ],
-        ));
+          ),
+          Divider(
+            color: Colors.grey,
+          ),
+          Container(
+            height: 150,
+            width: MediaQuery.of(context).size.width,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return StyleCard();
+              },
+              itemCount: 10,
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 

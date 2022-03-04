@@ -22,7 +22,7 @@ class TailVengApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: HomeView(),
+      home: LoginView(),
     );
   }
 }

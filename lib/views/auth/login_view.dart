@@ -98,7 +98,14 @@ class _LoginViewState extends State<LoginView> {
                   width: MediaQuery.of(context).size.width,
                   height: 50,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginView(),
+                        ),
+                      );
+                    },
                     style: TextButton.styleFrom(
                       backgroundColor: Color(0xFFFC317B),
                     ),
