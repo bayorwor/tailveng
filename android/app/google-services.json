@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "175223967410",
+    "project_id": "techvengers-4449a",
+    "storage_bucket": "techvengers-4449a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175223967410:android:0e451ecf18bb579b1383ab",
+        "android_client_info": {
+          "package_name": "com.example.tailveng"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "175223967410-js8mfi5o9o2i2bvds3v3jh9qcrqdsdn1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGG6BsuGWnbMxRnt9OQ0-Yc9i8wdi03zo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "175223967410-js8mfi5o9o2i2bvds3v3jh9qcrqdsdn1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

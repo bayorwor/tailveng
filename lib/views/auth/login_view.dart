@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tailveng/resources/auth_methods.dart';
 import 'package:tailveng/views/auth/register_view.dart';
+import 'package:tailveng/views/home_view.dart';
+import 'package:tailveng/widgets/toastwidget.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -9,6 +12,46 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+  }
+
+  loginUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    AuthMethods()
+        .loginUser(
+            email: _emailController.text, password: _passwordController.text)
+        .then((value) => {
+              if (value == "success")
+                {
+                  setState(() {
+                    _isLoading = false;
+                  }),
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomeView()))
+                }
+              else
+                {
+                  setState(() {
+                    _isLoading = false;
+                  }),
+                  showToast(value)
+                }
+            });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,110 +88,119 @@ class _LoginViewState extends State<LoginView> {
                 topRight: Radius.circular(20),
               ),
             ),
-            child: Center(
-              child: Form(
-                  child: Column(children: [
-                TextFormField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelText: "Email",
-                    labelStyle: TextStyle(
-                      // color: Color(0xFFFC317B),
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelText: "Password",
-                    labelStyle: TextStyle(
-                      // color: Color(0xFFFC317B),
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        "Forgot Password?",
-                        style: TextStyle(
-                          color: Color(0xFFFC317B),
-                          fontSize: 20,
+            child: ListView(
+              children: [
+                Center(
+                  child: Form(
+                      key: _formKey,
+                      child: Column(children: [
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            labelText: "Email",
+                            labelStyle: const TextStyle(
+                              // color: Color(0xFFFC317B),
+                              fontSize: 20,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginView(),
+                        const SizedBox(
+                          height: 20,
                         ),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFFFC317B),
-                    ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account?",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterView()));
-                      },
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          color: Color(0xFFFC317B),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            labelText: "Password",
+                            labelStyle: const TextStyle(
+                              // color: Color(0xFFFC317B),
+                              fontSize: 20,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                )
-              ])),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () {},
+                              child: const Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                  color: Color(0xFFFC317B),
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 50,
+                          child: TextButton(
+                            onPressed: () {
+                              loginUser();
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xFFFC317B),
+                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator.adaptive(
+                                    backgroundColor: Colors.white,
+                                  )
+                                : const Text(
+                                    "Login",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Don't have an account?",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RegisterView()));
+                              },
+                              child: const Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  color: Color(0xFFFC317B),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ])),
+                ),
+              ],
             ),
           ),
         )

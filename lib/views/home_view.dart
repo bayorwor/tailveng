@@ -1,11 +1,37 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:tailveng/shared/style_card.dart';
+import 'package:tailveng/views/auth/login_view.dart';
 import 'package:tailveng/views/material_list.dart';
 import 'package:tailveng/views/measurement.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  initState() {
+    isUserAuthenticated();
+    super.initState();
+  }
+
+  isUserAuthenticated() {
+    _auth.authStateChanges().listen((user) {
+      if (user == null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginView()),
+            (route) => false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +51,10 @@ class HomeView extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
-            onPressed: () {},
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              _auth.signOut();
+            },
           ),
         ],
       ),
@@ -97,7 +125,7 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Center(

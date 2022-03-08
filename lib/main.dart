@@ -1,8 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tailveng/views/auth/login_view.dart';
 import 'package:tailveng/views/home_view.dart';
 
-void main(List<String> args) {
+void main(List<String> args) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(TailVengApp());
 }
 
@@ -22,7 +25,7 @@ class TailVengApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: LoginView(),
+      home: const HomeView(),
     );
   }
 }
