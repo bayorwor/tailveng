@@ -1,12 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tailveng/views/auth/login_view.dart';
 import 'package:tailveng/views/home_view.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(TailVengApp());
+  runApp(const TailVengApp());
 }
 
 class TailVengApp extends StatelessWidget {
@@ -19,8 +18,9 @@ class TailVengApp extends StatelessWidget {
       title: "TailVeng",
       theme: ThemeData(
         primaryColor: const Color(0xFFFC317B),
+        primarySwatch: Colors.pink,
         fontFamily: "Montserrat",
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           color: Color(0xFFFC317B),
           elevation: 0,
         ),

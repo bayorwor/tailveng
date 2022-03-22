@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tailveng/resources/auth_methods.dart';
+import 'package:tailveng/views/auth/forget_password.dart';
 import 'package:tailveng/views/auth/register_view.dart';
 import 'package:tailveng/views/home_view.dart';
 import 'package:tailveng/widgets/toastwidget.dart';
@@ -39,8 +40,9 @@ class _LoginViewState extends State<LoginView> {
                   setState(() {
                     _isLoading = false;
                   }),
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomeView()))
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const HomeView()),
+                      (route) => false),
                 }
               else
                 {
@@ -133,7 +135,11 @@ class _LoginViewState extends State<LoginView> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        ForgetPasswordView()));
+                              },
                               child: const Text(
                                 "Forgot Password?",
                                 style: TextStyle(

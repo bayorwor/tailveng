@@ -1,6 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tailveng/resources/cleints_methods.dart';
 import 'package:tailveng/widgets/toastwidget.dart';
+import 'package:unicons/unicons.dart';
+
+import '../utils/utils.dart';
 
 class Measurement extends StatefulWidget {
   const Measurement({Key? key}) : super(key: key);
@@ -24,6 +30,8 @@ class _MeasurementState extends State<Measurement> {
 
   bool _isLoading = false;
 
+  Uint8List? _image;
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -38,6 +46,22 @@ class _MeasurementState extends State<Measurement> {
     _lengthController.dispose();
     _locationController.dispose();
     _phoneController.dispose();
+  }
+
+  // selecting image from gallery
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+// selecting image from camera
+  void selectCamera() async {
+    Uint8List im = await pickImage(ImageSource.camera);
+    setState(() {
+      _image = im;
+    });
   }
 
 //send data to server
@@ -58,7 +82,7 @@ class _MeasurementState extends State<Measurement> {
         length: _lengthController.text,
         height: _heightController.text,
         location: _locationController.text,
-        image: "image",
+        image: _image!,
       )
           .then((value) {
         if (value == "success") {
@@ -91,7 +115,32 @@ class _MeasurementState extends State<Measurement> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.pink,
-        title: Text('Measurement'),
+        title: const Text('Measurement'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator.adaptive(
+                      backgroundColor: Colors.white,
+                    ),
+                  )
+                : TextButton.icon(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        side: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    icon: const Icon(UniconsLine.save),
+                    label: const Text('Save'),
+                    onPressed: () {
+                      sendData();
+                    },
+                  ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Stack(
@@ -143,7 +192,7 @@ class _MeasurementState extends State<Measurement> {
                               ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)))),
-                      SizedBox(height: 18),
+                      const SizedBox(height: 18),
                       TextFormField(
                           controller: _phoneController,
                           validator: (value) {
@@ -160,7 +209,7 @@ class _MeasurementState extends State<Measurement> {
                               ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)))),
-                      SizedBox(height: 18),
+                      const SizedBox(height: 18),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -343,18 +392,57 @@ class _MeasurementState extends State<Measurement> {
                       const SizedBox(height: 18),
                       const Text("Sample of Fabric"),
                       const SizedBox(height: 18),
-                      Image(image: AssetImage('assets/placeholder.jpg')),
-                      const SizedBox(height: 18),
-                      OutlinedButton(
-                        onPressed: () {
-                          sendData();
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text(
+                                        "Select Image from",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          selectCamera();
+                                        },
+                                        icon: const Icon(
+                                          UniconsLine.camera,
+                                          size: 50,
+                                          color: Colors.black,
+                                        ),
+                                        label: const Text("camera"),
+                                      ),
+                                      const Divider(),
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          selectImage();
+                                        },
+                                        icon: const Icon(
+                                          UniconsLine.image,
+                                          size: 50,
+                                        ),
+                                        label: const Text("gallery"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
                         },
-                        child: _isLoading
-                            ? const CircularProgressIndicator.adaptive(
-                                backgroundColor: Colors.white,
-                              )
-                            : Text('Save measurement'),
+                        child: _image == null
+                            ? Image.asset('assets/placeholder.jpg')
+                            : Image.memory(_image!),
                       ),
+                      const SizedBox(height: 18),
                     ],
                   ),
                 ),

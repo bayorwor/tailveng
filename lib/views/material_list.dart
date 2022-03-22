@@ -1,10 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
 import 'package:tailveng/resources/cleints_methods.dart';
+import 'package:tailveng/views/client_details.dart';
+import 'package:tailveng/widgets/toastwidget.dart';
 
 class MaterialList extends StatefulWidget {
-  MaterialList({Key? key}) : super(key: key);
+  MaterialList({
+    Key? key,
+    required this.materials,
+  }) : super(key: key);
+
+  final String materials;
 
   @override
   State<MaterialList> createState() => _MaterialListState();
@@ -17,10 +25,14 @@ class _MaterialListState extends State<MaterialList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Material List'),
+        title: Text('${widget.materials} List'),
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>?>>(
-          stream: ClientMethods().getClients(),
+          stream: widget.materials == "completed"
+              ? ClientMethods().getCompletedMaterials()
+              : widget.materials == "pending"
+                  ? ClientMethods().getNotCompleted()
+                  : ClientMethods().getClients(),
           builder: (context, snapshot) {
             return ListView.builder(
               itemBuilder: (context, index) {
@@ -34,7 +46,6 @@ class _MaterialListState extends State<MaterialList> {
                     snapshot.data == null) {
                   return const Center(child: Text('No data available'));
                 }
-
                 return Slidable(
                   // Specify a key if the Slidable is dismissible.
                   key: const ValueKey(0),
@@ -43,25 +54,65 @@ class _MaterialListState extends State<MaterialList> {
                   endActionPane: ActionPane(
                     motion: ScrollMotion(),
                     children: [
+                      widget.materials != "completed"
+                          ? SlidableAction(
+                              // An action can be bigger than the others.
+                              // flex: 2,
+                              onPressed: (context) {
+                                if (widget.materials == "completed") {
+                                  return;
+                                } else if (widget.materials == "pending") {
+                                  String value = ClientMethods().updateToDone(
+                                      snapshot.data!.docs[index].id);
+
+                                  if (value == "success") {
+                                    showToast("Updated successfully",
+                                        color: Colors.green);
+                                  } else {
+                                    showToast("OOPS!! something went wrong",
+                                        color: Colors.red);
+                                  }
+                                } else {
+                                  ClientMethods().updateToDone(
+                                      snapshot.data!.docs[index].id);
+                                }
+                              },
+                              backgroundColor: Color(0xFF7BC043),
+                              foregroundColor: Colors.white,
+                              icon: Icons.check_circle,
+                              label: 'Done',
+                            )
+                          : Text(""),
                       SlidableAction(
-                        // An action can be bigger than the others.
-                        // flex: 2,
                         onPressed: (context) {
-                          print('pressed');
+                          String value = ClientMethods()
+                              .deleteOne(snapshot.data!.docs[index].id);
+
+                          if (value == "success") {
+                            showToast("Deleted successfully",
+                                color: Colors.green);
+                          } else {
+                            showToast("OOPS!! something went wrong",
+                                color: Colors.red);
+                          }
                         },
-                        backgroundColor: Color(0xFF7BC043),
-                        foregroundColor: Colors.white,
-                        icon: Icons.check_circle,
-                        label: 'Done',
-                      ),
-                      SlidableAction(
-                        onPressed: (context) {
-                          print('pressed');
-                        },
-                        backgroundColor: Color(0xFF0392CF),
+                        backgroundColor: Color(0xFF0F0F0F),
                         foregroundColor: Colors.white,
                         icon: Icons.delete,
                         label: 'Remove',
+                      ),
+                      SlidableAction(
+                        onPressed: (context) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ClientDetails(
+                                      client: snapshot.data!.docs[index])));
+                        },
+                        backgroundColor: Color(0xFF0392CF),
+                        foregroundColor: Colors.white,
+                        icon: Icons.visibility,
+                        label: 'View',
                       ),
                     ],
                   ),
@@ -75,14 +126,15 @@ class _MaterialListState extends State<MaterialList> {
                         subtitle:
                             Text('${snapshot.data!.docs[index]['phone']}'),
                         leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            'https://picsum.photos/250?image=9',
-                            width: 60.0,
-                            height: 120.0,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: snapshot.data!.docs[index]["image"] != null
+                                ? Image.network(
+                                    '${snapshot.data!.docs[index]['image']}',
+                                    width: 60.0,
+                                    height: 120.0,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const CircularProgressIndicator.adaptive()),
                       ),
                       Divider(),
                     ],

@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tailveng/resources/auth_methods.dart';
 import 'package:tailveng/views/auth/login_view.dart';
 import 'package:tailveng/views/home_view.dart';
 import 'package:tailveng/widgets/toastwidget.dart';
+import 'package:unicons/unicons.dart';
+
+import '../../utils/utils.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -22,6 +28,8 @@ class _RegisterViewState extends State<RegisterView> {
 
   String usertype = "designer";
 
+  Uint8List? _image;
+
   bool isVisible = false;
 
   bool _isLoading = false;
@@ -36,6 +44,22 @@ class _RegisterViewState extends State<RegisterView> {
     _passwordController.dispose();
   }
 
+// selecting image from gallery
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+// selecting image from camera
+  void selectCamera() async {
+    Uint8List im = await pickImage(ImageSource.camera);
+    setState(() {
+      _image = im;
+    });
+  }
+
   createAccount() {
     setState(() {
       _isLoading = true;
@@ -47,14 +71,16 @@ class _RegisterViewState extends State<RegisterView> {
       phone: _phoneController.text,
       usertype: usertype,
       password: _passwordController.text,
+      profilePic: _image!,
     )
         .then((value) {
       if (value == "success") {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeView()));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeView()),
+            (route) => false);
       } else {
         setState(() {
           _isLoading = false;
@@ -72,22 +98,88 @@ class _RegisterViewState extends State<RegisterView> {
         Positioned(
           top: 0,
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.3,
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(20),
             color: Color(0xFFFC317B),
             child: SizedBox(
               height: 80,
               width: 80,
-              child: Image.asset(
-                "assets/logot.png",
-                fit: BoxFit.contain,
+              child: Center(
+                child: Stack(
+                  children: [
+                    _image != null
+                        ? CircleAvatar(
+                            radius: 40,
+                            backgroundImage: MemoryImage(_image!),
+                          )
+                        : const CircleAvatar(
+                            radius: 40,
+                            backgroundImage: AssetImage('assets/user.png'),
+                          ),
+                    Positioned(
+                        bottom: -5,
+                        left: 40,
+                        child: IconButton(
+                          onPressed: () {
+                            // selectImage();
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          "Select Image from",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextButton.icon(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            selectCamera();
+                                          },
+                                          icon: const Icon(
+                                            UniconsLine.camera,
+                                            size: 50,
+                                            color: Colors.black,
+                                          ),
+                                          label: const Text("camera"),
+                                        ),
+                                        const Divider(),
+                                        TextButton.icon(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            selectImage();
+                                          },
+                                          icon: const Icon(
+                                            UniconsLine.image,
+                                            size: 50,
+                                          ),
+                                          label: const Text("gallery"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
+                          },
+                          icon: const Icon(
+                            Icons.add_a_photo,
+                            color: Colors.white,
+                          ),
+                        ))
+                  ],
+                ),
               ),
             ),
           ),
         ),
         Positioned(
-          top: MediaQuery.of(context).size.height * 0.15,
+          top: MediaQuery.of(context).size.height * 0.24,
           bottom: 0,
           child: Container(
             padding: const EdgeInsets.all(20),
